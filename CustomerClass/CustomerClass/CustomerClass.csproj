@@ -44,6 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LingYin.Apply\RebateDetail.cs" />
+    <Compile Include="LingYin.Apply\RecogForLingYin.cs" />
+    <Compile Include="ProjectApproval\Company.cs" />
+    <Compile Include="ProjectApproval\Department.cs" />
+    <Compile Include="ProjectApproval\Employee.cs" />
     <Compile Include="ProjectApproval\MatchDaoKuan.cs" />
     <Compile Include="ProjectApproval\MessageDetailInfo.cs" />
     <Compile Include="ProjectApproval\MessageNoticeInfo.cs" />
@@ -51,6 +56,9 @@
     <Compile Include="ProjectApproval\RecogInfo.cs" />
     <Compile Include="ProjectApproval\UpdateExcelInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateOAForBeijingBank\ExcelDataForBeijingBank.cs" />
+    <Compile Include="YongYou.AddPO\POCategory.cs" />
+    <Compile Include="YongYou.AddPO\RecogForYongYouAddPO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -59,5 +59,10 @@ namespace CustomerClass.ProjectApproval
         /// 合同名称
         /// </summary>
         public string ContractName { get; set; }
+
+        /// <summary>
+        /// 合同文档路径
+        /// </summary>
+        public string ContractDocsPath { get; set; }
     }
 }
