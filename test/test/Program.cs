@@ -101,11 +101,13 @@ namespace test
             }
             {
                 //合并图片
-                var mergeImage = new MergeImage();
-                mergeImage.GenerateImage();
+                // var mergeImage = new MergeImage();
+                // mergeImage.GenerateImage();
             }
             {
-                //计算字符串的hash值
+                //加密Rinjdael 
+                RijndaelExample example = new RijndaelExample();
+                example.Execute();
             }
             Console.Read();
         }
