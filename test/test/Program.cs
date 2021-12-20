@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace test
 {
@@ -106,10 +108,31 @@ namespace test
             }
             {
                 //加密Rinjdael 
-                RijndaelExample example = new RijndaelExample();
-                example.Execute();
+                // RijndaelExample example = new RijndaelExample();
+                // example.Execute();
+            }
+            {
+                var n = 0;
+                while (n < 100)
+                {
+                    var result = Process().Result;
+                    n++;
+                    Thread.Sleep(200);
+                }
             }
             Console.Read();
+        }
+
+        static async Task<bool> Process()
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine("abc111" + DateTime.Now.Ticks);
+                Thread.Sleep(1000);
+            });
+
+            Console.WriteLine("Ended - " + DateTime.Now.ToLongTimeString());
+            return true;
         }
     }
 }
