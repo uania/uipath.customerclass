@@ -1,6 +1,0 @@
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\bin\Debug\RPA.UiPath.Classlib.dll
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\bin\Debug\RPA.UiPath.Classlib.pdb
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\obj\Debug\RPA.UiPath.Classlib.csproj.CoreCompileInputs.cache
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\obj\Debug\RPA.UiPath.Classlib.dll
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\obj\Debug\RPA.UiPath.Classlib.pdb
-C:\Users\yifan.liu\source\repos\CustomerClass\RPA.UiPath.Classlib\obj\Debug\RPA.UiPath.Classlib.csproj.AssemblyReference.cache

@@ -23,6 +23,11 @@ namespace RPA.UiPath.Classlib.Exceptions
 
         }
 
+        public TerminalFlowException(string message, string reason) : base(message)
+        {
+
+        }
+
         public TerminalFlowException(string message, Exception inner) : base(message, inner)
         {
 
