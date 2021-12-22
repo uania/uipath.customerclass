@@ -16,3 +16,5 @@ test/test/.vscode/*
 /CustomerClass/RPA.UiPath.Classlib/obj/*
 .gitignore
 /CustomerClass/packages
+/CustomerClass/Test/bin*
+/CustomerClass/Test/obj*

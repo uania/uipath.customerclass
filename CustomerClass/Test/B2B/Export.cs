@@ -1,63 +1,24 @@
-﻿using RPA.UiPath.Classlib.Models.B2B;
-using System.Activities;
-using System.Collections.Generic;
-using System.ComponentModel;
-using NPOI;
-using System.IO;
-using NPOI.SS.UserModel;
-using NPOI.HSSF.UserModel;
-using NPOI.XSSF.UserModel;
-using System;
-using System.Text;
+﻿using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
+using RPA.UiPath.Classlib.Models.B2B;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace RPA.UiPath.Classlib.Activities.B2B
+namespace Test.B2B
 {
-    public class ExportExcel : CodeActivity
+    class Export
     {
-        /// <summary>
-        /// 需要导出的数据
-        /// </summary>
-        [Category("Input")]
-        [RequiredArgument]
-        public InArgument<List<ExportTemp>> ExportTemps { get; set; }
-
-        /// <summary>
-        /// 工作薄路径
-        /// </summary>
-        [Category("Input")]
-        [RequiredArgument]
-        public InArgument<string> WorkbookFolder { get; set; }
-
-        /// <summary>
-        /// Sheet name
-        /// </summary>
-        [Category("Input")]
-        [RequiredArgument]
-        public InArgument<string> Sheet1Name { get; set; }
-
-        /// <summary>
-        /// Sheet name
-        /// </summary>
-        [Category("Input")]
-        [RequiredArgument]
-        public InArgument<string> Sheet2Name { get; set; }
-
-        /// <summary>
-        /// origin from
-        /// </summary>
-        [Category("Input")]
-        [RequiredArgument]
-        public InArgument<string> From { get; set; }
-
-        protected override void Execute(CodeActivityContext context)
+        public void Excute(List<ExportTemp> exportTemps)
         {
-            var exportTemps = ExportTemps.Get(context);
-            var workbookFolder = WorkbookFolder.Get(context);
-            var sheet1Name = Sheet1Name.Get(context);
-            var sheet2Name = Sheet2Name.Get(context);
-            var from = From.Get(context);
+            var workbookFolder = "d:\\SCRM";
+            var sheet1Name = "【Summary】";
+            var sheet2Name = "【ssss】";
+            var from = "sajgofijaerogije";
 
             if (!Directory.Exists(workbookFolder))
             {
@@ -106,16 +67,17 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                     var rowNumber = i + 1;
                     var row = summarySheet.CreateRow(rowNumber);
                     var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    row.CreateCell(0);
-                    var cell1 = row.CreateCell(1);
-                    cell1.CellStyle = cellStyle;
-                    cell1.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
-                    var cell2 = row.CreateCell(2);
+                    var cell1 = row.CreateCell(0);
+                    //cell1.CellStyle = cellStyle;
+                    var cell2 = row.CreateCell(1);
                     cell2.CellStyle = cellStyle;
-                    cell2.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
+                    cell2.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
+                    var cell3 = row.CreateCell(2);
+                    cell3.CellStyle = cellStyle;
+                    cell3.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
                 }
                 //设置表格第一列的合并数据
-                summarySheet.GetRow(1).GetCell(1).SetCellValue(from);
+                summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
 
                 //总计
                 var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
@@ -143,22 +105,12 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                 {
                     var rowNumber = i + 1;
                     var row = eventhubSheet.CreateRow(rowNumber);
-                    var style = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    var rowCell0 = row.CreateCell(0);
-                    rowCell0.CellStyle = style;
-                    rowCell0.SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
-                    var rowCell1 = row.CreateCell(1);
-                    rowCell1.CellStyle = style;
-                    rowCell1.SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
-                    var rowCell2 = row.CreateCell(2);
-                    rowCell2.CellStyle = style;
-                    rowCell2.SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
-                    var rowCell3 = row.CreateCell(3);
-                    rowCell3.CellStyle = style;
-                    rowCell3.SetCellValue(item.MicrosoftDailyOrigins[i].Title);
-                    var rowCell4 = row.CreateCell(4);
-                    rowCell4.CellStyle = style;
-                    rowCell4.SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
+                    row.RowStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
+                    row.CreateCell(0).SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
+                    row.CreateCell(1).SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
+                    row.CreateCell(2).SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
+                    row.CreateCell(3).SetCellValue(item.MicrosoftDailyOrigins[i].Title);
+                    row.CreateCell(4).SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
                 }
 
                 //保存文件

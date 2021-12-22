@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomerClass", "CustomerCl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPA.UiPath.Classlib", "RPA.UiPath.Classlib\RPA.UiPath.Classlib.csproj", "{EA2D168B-8F0A-4556-AC63-DDFEB6427B07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{8AAFC399-002D-40C7-B65F-540EAEAC725A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EA2D168B-8F0A-4556-AC63-DDFEB6427B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA2D168B-8F0A-4556-AC63-DDFEB6427B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA2D168B-8F0A-4556-AC63-DDFEB6427B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AAFC399-002D-40C7-B65F-540EAEAC725A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AAFC399-002D-40C7-B65F-540EAEAC725A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AAFC399-002D-40C7-B65F-540EAEAC725A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AAFC399-002D-40C7-B65F-540EAEAC725A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
