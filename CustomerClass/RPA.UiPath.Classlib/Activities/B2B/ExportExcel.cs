@@ -51,6 +51,9 @@ namespace RPA.UiPath.Classlib.Activities.B2B
         [RequiredArgument]
         public InArgument<string> From { get; set; }
 
+        [Category("Output")]
+        public OutArgument<List<string>> FilePaths { get; set; }
+
         protected override void Execute(CodeActivityContext context)
         {
             var exportTemps = ExportTemps.Get(context);
@@ -65,6 +68,8 @@ namespace RPA.UiPath.Classlib.Activities.B2B
             }
 
             var n = 1;
+            var filePaths = new List<string>();
+
             foreach (var item in exportTemps)
             {
                 var fileName = $"{n}{DateTime.Now:yyyyMMddHHmmss}.xlsx";
@@ -115,12 +120,12 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                     cell2.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
                 }
                 //设置表格第一列的合并数据
-                summarySheet.GetRow(1).GetCell(1).SetCellValue(from);
+                summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
 
                 //总计
                 var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
                 var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
-                var totalStyle = item.MicrosoftDailyStatistics.Count % 2 == 0 ? evenCellstyle : oddCellstyle;
+                var totalStyle = (item.MicrosoftDailyStatistics.Count + 1) % 2 == 0 ? evenCellstyle : oddCellstyle;
                 var totalCell0 = totalRow.CreateCell(0);
                 totalCell0.CellStyle = totalStyle;
                 totalCell0.SetCellValue("合计");
@@ -166,8 +171,11 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                 {
                     workbook.Write(stream);
                 }
+                filePaths.Add(workbookPath);
                 n++;
             }
+
+            FilePaths.Set(context, filePaths);
         }
 
         /// <summary>
