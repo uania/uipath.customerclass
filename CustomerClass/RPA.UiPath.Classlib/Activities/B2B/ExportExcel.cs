@@ -11,6 +11,7 @@ using System;
 using System.Text;
 using NPOI.SS.Util;
 using System.Linq;
+using RPA.UiPath.Classlib.Common.Tools;
 
 namespace RPA.UiPath.Classlib.Activities.B2B
 {
@@ -56,126 +57,159 @@ namespace RPA.UiPath.Classlib.Activities.B2B
 
         protected override void Execute(CodeActivityContext context)
         {
-            var exportTemps = ExportTemps.Get(context);
-            var workbookFolder = WorkbookFolder.Get(context);
-            var sheet1Name = Sheet1Name.Get(context);
-            var sheet2Name = Sheet2Name.Get(context);
-            var from = From.Get(context);
-
-            if (!Directory.Exists(workbookFolder))
+            try
             {
-                Directory.CreateDirectory(workbookFolder);
+                var exportTemps = ExportTemps.Get(context);
+                var workbookFolder = WorkbookFolder.Get(context);
+                var sheet1Name = Sheet1Name.Get(context);
+                var sheet2Name = Sheet2Name.Get(context);
+                var from = From.Get(context);
+
+                if (!Directory.Exists(workbookFolder))
+                {
+                    Directory.CreateDirectory(workbookFolder);
+                }
+
+                var n = 1;
+                var filePaths = new List<string>();
+
+                foreach (var item in exportTemps)
+                {
+                    string fileNamePrefix;
+                    if (string.IsNullOrWhiteSpace(item.MessageTitle))
+                    {
+                        fileNamePrefix = $"第{n}条会议";
+                    }
+                    else
+                    {
+                        //去除非法文件名字符
+                        fileNamePrefix = item.MessageTitle.Replace("\\", "")
+                            .Replace("/", "")
+                            .Replace(":", "")
+                            .Replace("*", "")
+                            .Replace("?", "")
+                            .Replace("\"", "")
+                            .Replace("<", "")
+                            .Replace(">", "")
+                            .Replace("|", "")
+                            .Trim();
+                        if (string.IsNullOrWhiteSpace(fileNamePrefix))
+                        {
+                            fileNamePrefix = $"第{n}条会议";
+                        }
+                    }
+                    ToolsFactory.Logger.WriteLog(fileNamePrefix);
+                    var fileName = $"{fileNamePrefix}{n}{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                    var workbookPath = $"{workbookFolder}\\{fileName}";
+                    IWorkbook workbook = new XSSFWorkbook();
+                    var summarySheet = workbook.CreateSheet(sheet1Name);
+                    var eventhubSheet = workbook.CreateSheet(sheet2Name);
+
+                    //头样式
+                    ICellStyle cellstyle = workbook.CreateCellStyle();
+                    cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.SkyBlue.Index;
+                    cellstyle.FillPattern = FillPattern.SolidForeground;
+                    cellstyle.VerticalAlignment = VerticalAlignment.Center;
+                    cellstyle.Alignment = HorizontalAlignment.Center;
+
+                    //奇数行样式
+                    ICellStyle oddCellstyle = workbook.CreateCellStyle();
+                    oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
+                    oddCellstyle.FillPattern = FillPattern.SolidForeground;
+                    oddCellstyle.VerticalAlignment = VerticalAlignment.Center;
+                    oddCellstyle.Alignment = HorizontalAlignment.Center;
+
+                    //偶数行样式
+                    var evenCellstyle = workbook.CreateCellStyle();
+                    evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Turquoise.Index;
+                    evenCellstyle.FillPattern = FillPattern.SolidForeground;
+                    evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
+                    evenCellstyle.Alignment = HorizontalAlignment.Center;
+
+                    //创建表头
+                    var summaryHeaders = new string[] { "来源", "报名渠道", "报名数量" };
+                    var eventhubHeaders = new string[] { "报名时间", "报名渠道", "公司", "公司职位", "是否报名" };
+                    CraeteHeaderRow(summarySheet, cellstyle, summaryHeaders);
+                    CraeteHeaderRow(eventhubSheet, cellstyle, eventhubHeaders);
+
+                    //填写内容
+                    for (var i = 0; i < item.MicrosoftDailyStatistics.Count; i++)
+                    {
+                        var rowNumber = i + 1;
+                        var row = summarySheet.CreateRow(rowNumber);
+                        var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
+                        row.CreateCell(0);
+                        var cell1 = row.CreateCell(1);
+                        cell1.CellStyle = cellStyle;
+                        cell1.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
+                        var cell2 = row.CreateCell(2);
+                        cell2.CellStyle = cellStyle;
+                        cell2.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
+                    }
+                    //设置表格第一列的合并数据
+                    summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
+
+                    //总计
+                    var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
+                    var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
+                    var totalStyle = (item.MicrosoftDailyStatistics.Count + 1) % 2 == 0 ? evenCellstyle : oddCellstyle;
+                    var totalCell0 = totalRow.CreateCell(0);
+                    totalCell0.CellStyle = totalStyle;
+                    totalCell0.SetCellValue("合计");
+                    totalRow.CreateCell(1).CellStyle = totalStyle;
+                    var totalCell2 = totalRow.CreateCell(2);
+                    totalCell2.CellStyle = totalStyle;
+                    totalCell2.SetCellValue(totalSummary);
+
+                    //合并单元格
+                    var totalRegion = new CellRangeAddress(item.MicrosoftDailyStatistics.Count + 1, item.MicrosoftDailyStatistics.Count + 1, 0, 1);
+                    summarySheet.AddMergedRegion(totalRegion);
+
+                    if (item.MicrosoftDailyStatistics.Count > 1)
+                    {
+                        var originRegion = new CellRangeAddress(1, item.MicrosoftDailyStatistics.Count, 0, 0);
+                        summarySheet.AddMergedRegion(originRegion);
+                    }
+
+                    for (var i = 0; i < item.MicrosoftDailyOrigins.Count; i++)
+                    {
+                        var rowNumber = i + 1;
+                        var row = eventhubSheet.CreateRow(rowNumber);
+                        var style = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
+                        var rowCell0 = row.CreateCell(0);
+                        rowCell0.CellStyle = style;
+                        rowCell0.SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
+                        var rowCell1 = row.CreateCell(1);
+                        rowCell1.CellStyle = style;
+                        rowCell1.SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
+                        var rowCell2 = row.CreateCell(2);
+                        rowCell2.CellStyle = style;
+                        rowCell2.SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
+                        var rowCell3 = row.CreateCell(3);
+                        rowCell3.CellStyle = style;
+                        rowCell3.SetCellValue(item.MicrosoftDailyOrigins[i].Title);
+                        var rowCell4 = row.CreateCell(4);
+                        rowCell4.CellStyle = style;
+                        rowCell4.SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
+                    }
+
+                    //保存文件
+                    using (var stream = new FileStream(workbookPath, FileMode.Create, FileAccess.Write))
+                    {
+                        workbook.Write(stream);
+                    }
+                    filePaths.Add(workbookPath);
+                    n++;
+                }
+
+                FilePaths.Set(context, filePaths);
             }
-
-            var n = 1;
-            var filePaths = new List<string>();
-
-            foreach (var item in exportTemps)
+            catch (Exception ex)
             {
-                var fileName = $"{n}{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                var workbookPath = $"{workbookFolder}\\{fileName}";
-                IWorkbook workbook = new XSSFWorkbook();
-                var summarySheet = workbook.CreateSheet(sheet1Name);
-                var eventhubSheet = workbook.CreateSheet(sheet2Name);
-
-                //头样式
-                ICellStyle cellstyle = workbook.CreateCellStyle();
-                cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Blue.Index;
-                cellstyle.FillPattern = FillPattern.SolidForeground;
-                cellstyle.VerticalAlignment = VerticalAlignment.Center;
-                cellstyle.Alignment = HorizontalAlignment.Center;
-
-                //奇数行样式
-                ICellStyle oddCellstyle = workbook.CreateCellStyle();
-                oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
-                oddCellstyle.FillPattern = FillPattern.SolidForeground;
-                oddCellstyle.VerticalAlignment = VerticalAlignment.Center;
-                oddCellstyle.Alignment = HorizontalAlignment.Center;
-
-                //偶数行样式
-                var evenCellstyle = workbook.CreateCellStyle();
-                evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.LightBlue.Index;
-                evenCellstyle.FillPattern = FillPattern.SolidForeground;
-                evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
-                evenCellstyle.Alignment = HorizontalAlignment.Center;
-
-                //创建表头
-                var summaryHeaders = new string[] { "来源", "报名渠道", "报名数量" };
-                var eventhubHeaders = new string[] { "报名时间", "报名渠道", "公司", "公司职位", "是否报名" };
-                CraeteHeaderRow(summarySheet, cellstyle, summaryHeaders);
-                CraeteHeaderRow(eventhubSheet, cellstyle, eventhubHeaders);
-
-                //填写内容
-                for (var i = 0; i < item.MicrosoftDailyStatistics.Count; i++)
-                {
-                    var rowNumber = i + 1;
-                    var row = summarySheet.CreateRow(rowNumber);
-                    var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    row.CreateCell(0);
-                    var cell1 = row.CreateCell(1);
-                    cell1.CellStyle = cellStyle;
-                    cell1.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
-                    var cell2 = row.CreateCell(2);
-                    cell2.CellStyle = cellStyle;
-                    cell2.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
-                }
-                //设置表格第一列的合并数据
-                summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
-
-                //总计
-                var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
-                var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
-                var totalStyle = (item.MicrosoftDailyStatistics.Count + 1) % 2 == 0 ? evenCellstyle : oddCellstyle;
-                var totalCell0 = totalRow.CreateCell(0);
-                totalCell0.CellStyle = totalStyle;
-                totalCell0.SetCellValue("合计");
-                totalRow.CreateCell(1).CellStyle = totalStyle;
-                var totalCell2 = totalRow.CreateCell(2);
-                totalCell2.CellStyle = totalStyle;
-                totalCell2.SetCellValue(totalSummary);
-
-                //合并单元格
-                var totalRegion = new CellRangeAddress(item.MicrosoftDailyStatistics.Count + 1, item.MicrosoftDailyStatistics.Count + 1, 0, 1);
-                summarySheet.AddMergedRegion(totalRegion);
-
-                if (item.MicrosoftDailyStatistics.Count > 1)
-                {
-                    var originRegion = new CellRangeAddress(1, item.MicrosoftDailyStatistics.Count, 0, 0);
-                    summarySheet.AddMergedRegion(originRegion);
-                }
-
-                for (var i = 0; i < item.MicrosoftDailyOrigins.Count; i++)
-                {
-                    var rowNumber = i + 1;
-                    var row = eventhubSheet.CreateRow(rowNumber);
-                    var style = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    var rowCell0 = row.CreateCell(0);
-                    rowCell0.CellStyle = style;
-                    rowCell0.SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
-                    var rowCell1 = row.CreateCell(1);
-                    rowCell1.CellStyle = style;
-                    rowCell1.SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
-                    var rowCell2 = row.CreateCell(2);
-                    rowCell2.CellStyle = style;
-                    rowCell2.SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
-                    var rowCell3 = row.CreateCell(3);
-                    rowCell3.CellStyle = style;
-                    rowCell3.SetCellValue(item.MicrosoftDailyOrigins[i].Title);
-                    var rowCell4 = row.CreateCell(4);
-                    rowCell4.CellStyle = style;
-                    rowCell4.SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
-                }
-
-                //保存文件
-                using (var stream = new FileStream(workbookPath, FileMode.Create, FileAccess.Write))
-                {
-                    workbook.Write(stream);
-                }
-                filePaths.Add(workbookPath);
-                n++;
+                ToolsFactory.Logger.WriteLog(ex);
+                ToolsFactory.Logger.WriteLog("============");
+                throw new Exceptions.TerminalFlowException(ex.Message, "意料之外的excel数据", ex);
             }
-
-            FilePaths.Set(context, filePaths);
         }
 
         /// <summary>

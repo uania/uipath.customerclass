@@ -61,8 +61,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\B2B\Dt2ExportTemp.cs" />
     <Compile Include="Activities\B2B\ExportExcel.cs" />
     <Compile Include="Activities\MouseEventHorizontal.cs" />
+    <Compile Include="Common\Tools\Logger.cs" />
+    <Compile Include="Common\Tools\ToolsFactory.cs" />
     <Compile Include="Enum\MouseEventHorizontal.cs" />
     <Compile Include="Exceptions\TerminalFlowException.cs" />
     <Compile Include="Models\B2B\ExportTemp.cs" />
@@ -70,9 +73,7 @@
     <Compile Include="Models\B2B\MicrosoftDailyStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\Tools\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

@@ -36,7 +36,7 @@ namespace Test.B2B
 
                 //头样式
                 ICellStyle cellstyle = workbook.CreateCellStyle();
-                cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Blue.Index;
+                cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.SkyBlue.Index;
                 cellstyle.FillPattern = FillPattern.SolidForeground;
                 cellstyle.VerticalAlignment = VerticalAlignment.Center;
                 cellstyle.Alignment = HorizontalAlignment.Center;
@@ -50,7 +50,7 @@ namespace Test.B2B
 
                 //偶数行样式
                 var evenCellstyle = workbook.CreateCellStyle();
-                evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.LightBlue.Index;
+                evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Turquoise.Index;
                 evenCellstyle.FillPattern = FillPattern.SolidForeground;
                 evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 evenCellstyle.Alignment = HorizontalAlignment.Center;

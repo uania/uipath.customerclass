@@ -9,6 +9,11 @@ namespace RPA.UiPath.Classlib.Models.B2B
     public class ExportTemp
     {
         /// <summary>
+        /// 会议主题
+        /// </summary>
+        public string MessageTitle { get; set; }
+
+        /// <summary>
         /// 分组前的结果
         /// </summary>
         public List<MicrosoftDailyOrigin> MicrosoftDailyOrigins { get; set; }
