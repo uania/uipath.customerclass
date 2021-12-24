@@ -55,20 +55,37 @@ namespace Test.B2B
                 evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 evenCellstyle.Alignment = HorizontalAlignment.Center;
 
+                //合并行的样式
+                var mergeCellstyle = workbook.CreateCellStyle();
+                mergeCellstyle.VerticalAlignment = VerticalAlignment.Center;
+                mergeCellstyle.Alignment = HorizontalAlignment.Center;
+
                 //创建表头
                 var summaryHeaders = new string[] { "来源", "报名渠道", "报名数量" };
                 var eventhubHeaders = new string[] { "报名时间", "报名渠道", "公司", "公司职位", "是否报名" };
                 CraeteHeaderRow(summarySheet, cellstyle, summaryHeaders);
                 CraeteHeaderRow(eventhubSheet, cellstyle, eventhubHeaders);
 
+                //添加数据库来源
+                var dbRow = summarySheet.CreateRow(1);
+                var dbCell0 = dbRow.CreateCell(0);
+                dbCell0.CellStyle = oddCellstyle;
+                dbCell0.SetCellValue("数据库");
+                var dbCell1 = dbRow.CreateCell(1);
+                dbCell1.CellStyle = oddCellstyle;
+                dbCell1.SetCellValue("");
+                var dbCell2 = dbRow.CreateCell(2);
+                dbCell2.CellStyle = oddCellstyle;
+                dbCell2.SetCellValue("");
+
                 //填写内容
                 for (var i = 0; i < item.MicrosoftDailyStatistics.Count; i++)
                 {
-                    var rowNumber = i + 1;
+                    var rowNumber = i + 2;
                     var row = summarySheet.CreateRow(rowNumber);
                     var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
                     var cell1 = row.CreateCell(0);
-                    //cell1.CellStyle = cellStyle;
+                    cell1.CellStyle = mergeCellstyle;
                     var cell2 = row.CreateCell(1);
                     cell2.CellStyle = cellStyle;
                     cell2.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
@@ -76,13 +93,15 @@ namespace Test.B2B
                     cell3.CellStyle = cellStyle;
                     cell3.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
                 }
-                //设置表格第一列的合并数据
-                summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
-
+                if (item.MicrosoftDailyStatistics.Count > 0)
+                {
+                    //设置表格第一列的合并数据
+                    summarySheet.GetRow(2).GetCell(0).SetCellValue(from);
+                }
                 //总计
                 var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
-                var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
-                var totalStyle = item.MicrosoftDailyStatistics.Count % 2 == 0 ? evenCellstyle : oddCellstyle;
+                var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 2);
+                var totalStyle = (item.MicrosoftDailyStatistics.Count + 2) % 2 == 0 ? evenCellstyle : oddCellstyle;
                 var totalCell0 = totalRow.CreateCell(0);
                 totalCell0.CellStyle = totalStyle;
                 totalCell0.SetCellValue("合计");
@@ -92,12 +111,12 @@ namespace Test.B2B
                 totalCell2.SetCellValue(totalSummary);
 
                 //合并单元格
-                var totalRegion = new CellRangeAddress(item.MicrosoftDailyStatistics.Count + 1, item.MicrosoftDailyStatistics.Count + 1, 0, 1);
-                summarySheet.AddMergedRegion(totalRegion);
+                //var totalRegion = new CellRangeAddress(item.MicrosoftDailyStatistics.Count + 2, item.MicrosoftDailyStatistics.Count + 2, 0, 1);
+                //summarySheet.AddMergedRegion(totalRegion);
 
                 if (item.MicrosoftDailyStatistics.Count > 1)
                 {
-                    var originRegion = new CellRangeAddress(1, item.MicrosoftDailyStatistics.Count, 0, 0);
+                    var originRegion = new CellRangeAddress(2, item.MicrosoftDailyStatistics.Count + 1, 0, 0);
                     summarySheet.AddMergedRegion(originRegion);
                 }
 
