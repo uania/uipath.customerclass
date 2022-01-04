@@ -40,6 +40,10 @@ namespace Test.B2B
                 cellstyle.FillPattern = FillPattern.SolidForeground;
                 cellstyle.VerticalAlignment = VerticalAlignment.Center;
                 cellstyle.Alignment = HorizontalAlignment.Center;
+                cellstyle.BorderBottom = BorderStyle.Thin;
+                cellstyle.BorderLeft = BorderStyle.Thin;
+                cellstyle.BorderRight = BorderStyle.Thin;
+                cellstyle.BorderTop = BorderStyle.Thin;
 
                 //奇数行样式
                 ICellStyle oddCellstyle = workbook.CreateCellStyle();
@@ -47,13 +51,21 @@ namespace Test.B2B
                 oddCellstyle.FillPattern = FillPattern.SolidForeground;
                 oddCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 oddCellstyle.Alignment = HorizontalAlignment.Center;
+                oddCellstyle.BorderBottom = BorderStyle.Thin;
+                oddCellstyle.BorderLeft = BorderStyle.Thin;
+                oddCellstyle.BorderRight = BorderStyle.Thin;
+                oddCellstyle.BorderTop = BorderStyle.Thin;
 
                 //偶数行样式
                 var evenCellstyle = workbook.CreateCellStyle();
-                evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Turquoise.Index;
-                evenCellstyle.FillPattern = FillPattern.SolidForeground;
+                //evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+                //evenCellstyle.FillPattern = FillPattern.SolidForeground;
                 evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 evenCellstyle.Alignment = HorizontalAlignment.Center;
+                evenCellstyle.BorderBottom = BorderStyle.Thin;
+                evenCellstyle.BorderLeft = BorderStyle.Thin;
+                evenCellstyle.BorderRight = BorderStyle.Thin;
+                evenCellstyle.BorderTop = BorderStyle.Thin;
 
                 //合并行的样式
                 var mergeCellstyle = workbook.CreateCellStyle();

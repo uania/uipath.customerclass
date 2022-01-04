@@ -18,3 +18,4 @@ test/test/.vscode/*
 /CustomerClass/packages
 /CustomerClass/Test/bin*
 /CustomerClass/Test/obj*
+*.suo
