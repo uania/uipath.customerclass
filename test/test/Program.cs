@@ -112,27 +112,12 @@ namespace test
                 // example.Execute();
             }
             {
-                var n = 0;
-                while (n < 100)
-                {
-                    var result = Process().Result;
-                    n++;
-                    Thread.Sleep(200);
-                }
+                //var ocr = new baidu_ocr();
+                //ocr.ExecOcr("d:\\u8.png", "https://aip.baidubce.com/rest/2.0/ocr/v1/form");
+
+                Form.form();
             }
             Console.Read();
-        }
-
-        static async Task<bool> Process()
-        {
-            await Task.Run(() =>
-            {
-                Console.WriteLine("abc111" + DateTime.Now.Ticks);
-                Thread.Sleep(1000);
-            });
-
-            Console.WriteLine("Ended - " + DateTime.Now.ToLongTimeString());
-            return true;
         }
     }
 }
