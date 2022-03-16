@@ -19,3 +19,5 @@ test/test/.vscode/*
 /CustomerClass/Test/bin*
 /CustomerClass/Test/obj*
 *.suo
+test/test4/bin/*
+test/test4/obj/*
