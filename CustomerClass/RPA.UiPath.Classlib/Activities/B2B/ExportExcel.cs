@@ -107,7 +107,7 @@ namespace RPA.UiPath.Classlib.Activities.B2B
 
                     //头样式
                     ICellStyle cellstyle = workbook.CreateCellStyle();
-                    cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.SkyBlue.Index;
+                    cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
                     cellstyle.FillPattern = FillPattern.SolidForeground;
                     cellstyle.VerticalAlignment = VerticalAlignment.Center;
                     cellstyle.Alignment = HorizontalAlignment.Center;
@@ -118,8 +118,8 @@ namespace RPA.UiPath.Classlib.Activities.B2B
 
                     //奇数行样式
                     ICellStyle oddCellstyle = workbook.CreateCellStyle();
-                    oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
-                    oddCellstyle.FillPattern = FillPattern.SolidForeground;
+                    //oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
+                    //oddCellstyle.FillPattern = FillPattern.SolidForeground;
                     oddCellstyle.VerticalAlignment = VerticalAlignment.Center;
                     oddCellstyle.Alignment = HorizontalAlignment.Center;
                     oddCellstyle.BorderBottom = BorderStyle.Thin;
@@ -150,23 +150,11 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                     CraeteHeaderRow(summarySheet, cellstyle, summaryHeaders);
                     CraeteHeaderRow(eventhubSheet, cellstyle, eventhubHeaders);
 
-                    //添加数据库来源
-                    var dbRow = summarySheet.CreateRow(1);
-                    var dbCell0 = dbRow.CreateCell(0);
-                    dbCell0.CellStyle = oddCellstyle;
-                    dbCell0.SetCellValue("数据库");
-                    var dbCell1 = dbRow.CreateCell(1);
-                    dbCell1.CellStyle = oddCellstyle;
-                    dbCell1.SetCellValue("");
-                    var dbCell2 = dbRow.CreateCell(2);
-                    dbCell2.CellStyle = oddCellstyle;
-                    dbCell2.SetCellValue("");
-
                     //填写内容
                     for (var i = 0; i < item.MicrosoftDailyStatistics.Count; i++)
                     {
-                        //第一行表头 第二行数据库空行
-                        var rowNumber = i + 2;
+                        //第一行表头
+                        var rowNumber = i + 1;
                         var row = summarySheet.CreateRow(rowNumber);
                         var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
                         row.CreateCell(0).CellStyle = mergeCellstyle;
@@ -180,16 +168,16 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                     if (item.MicrosoftDailyStatistics.Count > 0)
                     {
                         //设置表格第一列的合并数据
-                        summarySheet.GetRow(2).GetCell(0).SetCellValue(from);
+                        summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
                     }
                     //总计
                     var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
-                    var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 2);
+                    var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
                     var totalStyle = (item.MicrosoftDailyStatistics.Count + 2) % 2 == 0 ? evenCellstyle : oddCellstyle;
                     var totalCell0 = totalRow.CreateCell(0);
                     totalCell0.CellStyle = totalStyle;
                     totalCell0.SetCellValue("合计");
-                    totalRow.CreateCell(1).CellStyle = totalStyle;
+                    totalRow.CreateCell(1).CellStyle = totalStyle;  
                     var totalCell2 = totalRow.CreateCell(2);
                     totalCell2.CellStyle = totalStyle;
                     totalCell2.SetCellValue(totalSummary);
@@ -197,7 +185,7 @@ namespace RPA.UiPath.Classlib.Activities.B2B
                     //合并单元格
                     if (item.MicrosoftDailyStatistics.Count > 1)
                     {
-                        var originRegion = new CellRangeAddress(2, item.MicrosoftDailyStatistics.Count + 1, 0, 0);
+                        var originRegion = new CellRangeAddress(1, item.MicrosoftDailyStatistics.Count, 0, 0);
                         summarySheet.AddMergedRegion(originRegion);
                     }
 

@@ -36,7 +36,7 @@ namespace Test.B2B
 
                 //头样式
                 ICellStyle cellstyle = workbook.CreateCellStyle();
-                cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.SkyBlue.Index;
+                cellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
                 cellstyle.FillPattern = FillPattern.SolidForeground;
                 cellstyle.VerticalAlignment = VerticalAlignment.Center;
                 cellstyle.Alignment = HorizontalAlignment.Center;
@@ -47,8 +47,8 @@ namespace Test.B2B
 
                 //奇数行样式
                 ICellStyle oddCellstyle = workbook.CreateCellStyle();
-                oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
-                oddCellstyle.FillPattern = FillPattern.SolidForeground;
+                //oddCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.PaleBlue.Index;
+                //oddCellstyle.FillPattern = FillPattern.SolidForeground;
                 oddCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 oddCellstyle.Alignment = HorizontalAlignment.Center;
                 oddCellstyle.BorderBottom = BorderStyle.Thin;
@@ -56,9 +56,10 @@ namespace Test.B2B
                 oddCellstyle.BorderRight = BorderStyle.Thin;
                 oddCellstyle.BorderTop = BorderStyle.Thin;
 
+
                 //偶数行样式
                 var evenCellstyle = workbook.CreateCellStyle();
-                //evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+                //evenCellstyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Turquoise.Index;
                 //evenCellstyle.FillPattern = FillPattern.SolidForeground;
                 evenCellstyle.VerticalAlignment = VerticalAlignment.Center;
                 evenCellstyle.Alignment = HorizontalAlignment.Center;
@@ -78,41 +79,29 @@ namespace Test.B2B
                 CraeteHeaderRow(summarySheet, cellstyle, summaryHeaders);
                 CraeteHeaderRow(eventhubSheet, cellstyle, eventhubHeaders);
 
-                //添加数据库来源
-                var dbRow = summarySheet.CreateRow(1);
-                var dbCell0 = dbRow.CreateCell(0);
-                dbCell0.CellStyle = oddCellstyle;
-                dbCell0.SetCellValue("数据库");
-                var dbCell1 = dbRow.CreateCell(1);
-                dbCell1.CellStyle = oddCellstyle;
-                dbCell1.SetCellValue("");
-                var dbCell2 = dbRow.CreateCell(2);
-                dbCell2.CellStyle = oddCellstyle;
-                dbCell2.SetCellValue("");
-
                 //填写内容
                 for (var i = 0; i < item.MicrosoftDailyStatistics.Count; i++)
                 {
-                    var rowNumber = i + 2;
+                    //第一行表头
+                    var rowNumber = i + 1;
                     var row = summarySheet.CreateRow(rowNumber);
                     var cellStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    var cell1 = row.CreateCell(0);
-                    cell1.CellStyle = mergeCellstyle;
-                    var cell2 = row.CreateCell(1);
+                    row.CreateCell(0).CellStyle = mergeCellstyle;
+                    var cell1 = row.CreateCell(1);
+                    cell1.CellStyle = cellStyle;
+                    cell1.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
+                    var cell2 = row.CreateCell(2);
                     cell2.CellStyle = cellStyle;
-                    cell2.SetCellValue(item.MicrosoftDailyStatistics[i].ChannelName);
-                    var cell3 = row.CreateCell(2);
-                    cell3.CellStyle = cellStyle;
-                    cell3.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
+                    cell2.SetCellValue(item.MicrosoftDailyStatistics[i].NumberOfRegistration);
                 }
                 if (item.MicrosoftDailyStatistics.Count > 0)
                 {
                     //设置表格第一列的合并数据
-                    summarySheet.GetRow(2).GetCell(0).SetCellValue(from);
+                    summarySheet.GetRow(1).GetCell(0).SetCellValue(from);
                 }
                 //总计
                 var totalSummary = item.MicrosoftDailyStatistics.Sum(r => r.NumberOfRegistration);
-                var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 2);
+                var totalRow = summarySheet.CreateRow(item.MicrosoftDailyStatistics.Count + 1);
                 var totalStyle = (item.MicrosoftDailyStatistics.Count + 2) % 2 == 0 ? evenCellstyle : oddCellstyle;
                 var totalCell0 = totalRow.CreateCell(0);
                 totalCell0.CellStyle = totalStyle;
@@ -123,12 +112,9 @@ namespace Test.B2B
                 totalCell2.SetCellValue(totalSummary);
 
                 //合并单元格
-                //var totalRegion = new CellRangeAddress(item.MicrosoftDailyStatistics.Count + 2, item.MicrosoftDailyStatistics.Count + 2, 0, 1);
-                //summarySheet.AddMergedRegion(totalRegion);
-
                 if (item.MicrosoftDailyStatistics.Count > 1)
                 {
-                    var originRegion = new CellRangeAddress(2, item.MicrosoftDailyStatistics.Count + 1, 0, 0);
+                    var originRegion = new CellRangeAddress(1, item.MicrosoftDailyStatistics.Count, 0, 0);
                     summarySheet.AddMergedRegion(originRegion);
                 }
 
@@ -136,12 +122,22 @@ namespace Test.B2B
                 {
                     var rowNumber = i + 1;
                     var row = eventhubSheet.CreateRow(rowNumber);
-                    row.RowStyle = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
-                    row.CreateCell(0).SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
-                    row.CreateCell(1).SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
-                    row.CreateCell(2).SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
-                    row.CreateCell(3).SetCellValue(item.MicrosoftDailyOrigins[i].Title);
-                    row.CreateCell(4).SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
+                    var style = rowNumber % 2 == 0 ? evenCellstyle : oddCellstyle;
+                    var rowCell0 = row.CreateCell(0);
+                    rowCell0.CellStyle = style;
+                    rowCell0.SetCellValue(item.MicrosoftDailyOrigins[i].RegistrationTime);
+                    var rowCell1 = row.CreateCell(1);
+                    rowCell1.CellStyle = style;
+                    rowCell1.SetCellValue(item.MicrosoftDailyOrigins[i].ChannelName);
+                    var rowCell2 = row.CreateCell(2);
+                    rowCell2.CellStyle = style;
+                    rowCell2.SetCellValue(item.MicrosoftDailyOrigins[i].CompanyName);
+                    var rowCell3 = row.CreateCell(3);
+                    rowCell3.CellStyle = style;
+                    rowCell3.SetCellValue(item.MicrosoftDailyOrigins[i].Title);
+                    var rowCell4 = row.CreateCell(4);
+                    rowCell4.CellStyle = style;
+                    rowCell4.SetCellValue(item.MicrosoftDailyOrigins[i].IsRegistered ? "是" : "否");
                 }
 
                 //保存文件
